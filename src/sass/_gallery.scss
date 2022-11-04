@@ -1,0 +1,33 @@
+
+  header{
+    display: block;
+    background-color: rgb(22, 7, 232);
+    padding: 10px 0;
+  }
+
+  .search-form{
+    display: flex;
+    justify-content: center;
+    
+  }
+  .search-form input{
+    width: 330px;
+    height: 40px;
+    padding: 0 15px;
+  }
+  .search-form button{
+    padding: 0 9px;
+  }
+  
+  .is-hidden {
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    border: 0;
+    padding: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+}
