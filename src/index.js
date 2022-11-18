@@ -1,34 +1,64 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 import fetchCards from './js/fetch';
 import { addMarkup } from './js/markup'
-// import {createMarkup} from './js/markup'
+import { refs} from './js/refs'
 
-const refs = {
-  galleryEl: document.querySelector('.gallery'),
-  searchFormEl: document.querySelector('#search-form'),
-  inputEl: document.querySelector('input[name="searchQuery"]'),
-  
-  }
+  // плавная прокрутка страницы
+  function slowScroll(){
+    const { height: cardHeight } = document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
 
+    window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth",
+    });
+}
 
   let pageNumber = 1;
+  let searchName;
 
-refs.searchFormEl.addEventListener('submit', onSearchRequest)
+refs.searchFormEl.addEventListener('submit', onSearchRequest);
+refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 async function onSearchRequest(e){
     e.preventDefault();
     pageNumber = 1;
     refs.galleryEl.innerHTML = '';
-    const searchName = e.target.searchQuery.value.trim();
+    searchName = e.target.searchQuery.value.trim();
     const resultRequest = await fetchCards(searchName, pageNumber);
     if(resultRequest.hits.length === 0){
+      refs.loadMoreBtn.classList.add('is-hidden');
       Notify.failure('Sorry, there are no images matching your search query. Please try again.')
       }
       else{
-        await addMarkup(resultRequest.hits);
+        addMarkup(resultRequest.hits);
+        const lightbox = new SimpleLightbox('.gallery a');
         Notify.success(`Hooray! We found ${resultRequest.totalHits} images.`)
+        // slowScroll();  -- із середини відображення
+        let countPage = Math.ceil(resultRequest.totalHits / 40)
+        // console.log(countPage)
+        if(resultRequest.totalHits < 40 || pageNumber === countPage ){
+          refs.loadMoreBtn.classList.add('is-hidden');
+          setTimeout(() =>{Notify.info("We're sorry, but you've reached the end of search results.")}, 3500)
+        }else{
+          refs.loadMoreBtn.classList.remove('is-hidden');
+        }
       }
-  console.log(searchName);
-    console.log(resultRequest);
+    refs.searchFormEl.reset();
     }
+
+  async function onLoadMore(){
+  
+    pageNumber += 1;
+    const moreResultRequest = await fetchCards(searchName, pageNumber);
+    addMarkup(moreResultRequest.hits);
+    const lightbox = new SimpleLightbox('.gallery a');
+    lightbox.refresh();
+    slowScroll();
+    if(moreResultRequest.hits.length < 40){
+      refs.loadMoreBtn.classList.add('is-hidden')
+      setTimeout(() =>{Notify.info("We're sorry, but you've reached the end of search results.")}, 3500  )
+    }
+  }
