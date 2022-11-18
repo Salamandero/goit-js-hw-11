@@ -7,7 +7,7 @@ import { addMarkup } from './js/markup'
 import { refs} from './js/refs'
 
   // плавная прокрутка страницы
-  function slowScroll(){
+  function smoothScroll(){
     const { height: cardHeight } = document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
 
     window.scrollBy({
@@ -36,7 +36,7 @@ async function onSearchRequest(e){
         addMarkup(resultRequest.hits);
         const lightbox = new SimpleLightbox('.gallery a');
         Notify.success(`Hooray! We found ${resultRequest.totalHits} images.`)
-        // slowScroll();  -- із середини відображення
+        // smoothScroll();  -- із середини відображається
         let countPage = Math.ceil(resultRequest.totalHits / 40)
         // console.log(countPage)
         if(resultRequest.totalHits < 40 || pageNumber === countPage ){
@@ -56,7 +56,7 @@ async function onSearchRequest(e){
     addMarkup(moreResultRequest.hits);
     const lightbox = new SimpleLightbox('.gallery a');
     lightbox.refresh();
-    slowScroll();
+    smoothScroll();
     if(moreResultRequest.hits.length < 40){
       refs.loadMoreBtn.classList.add('is-hidden')
       setTimeout(() =>{Notify.info("We're sorry, but you've reached the end of search results.")}, 3500  )
