@@ -1,5 +1,5 @@
-
 import {refs} from './refs';
+
 
 const createMarkup = (data) => data.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>   {
       return `<div class="photo-card">

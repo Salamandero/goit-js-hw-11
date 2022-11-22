@@ -18,6 +18,8 @@ import { refs} from './js/refs'
 
   let pageNumber = 1;
   let searchName;
+  const lightbox = new SimpleLightbox('.gallery a', { captionsData: "alt", captionDelay: 250 });
+  lightbox.refresh();
 
 refs.searchFormEl.addEventListener('submit', onSearchRequest);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
@@ -34,7 +36,7 @@ async function onSearchRequest(e){
       }
       else{
         addMarkup(resultRequest.hits);
-        const lightbox = new SimpleLightbox('.gallery a');
+        lightbox.refresh();
         Notify.success(`Hooray! We found ${resultRequest.totalHits} images.`)
         // smoothScroll();  -- із середини відображається
         let countPage = Math.ceil(resultRequest.totalHits / 40)
@@ -43,6 +45,7 @@ async function onSearchRequest(e){
           refs.loadMoreBtn.classList.add('is-hidden');
           setTimeout(() =>{Notify.info("We're sorry, but you've reached the end of search results.")}, 3500)
         }else{
+          lightbox.refresh();
           refs.loadMoreBtn.classList.remove('is-hidden');
         }
       }
@@ -54,7 +57,6 @@ async function onSearchRequest(e){
     pageNumber += 1;
     const moreResultRequest = await fetchCards(searchName, pageNumber);
     addMarkup(moreResultRequest.hits);
-    const lightbox = new SimpleLightbox('.gallery a');
     lightbox.refresh();
     smoothScroll();
     if(moreResultRequest.hits.length < 40){
